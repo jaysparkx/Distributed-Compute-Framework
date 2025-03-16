@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  head-node:
+    build: ./head_node
+    ports:
+      - "5001:5000"  # Flask API
+      - "5555:5555"  # ZeroMQ registration
+      - "5556:5556"  # ZeroMQ task distribution
+      - "5557:5557"  # ZeroMQ results
+      - "5558:5558"  # ZeroMQ heartbeat
+    depends_on:
+      - rabbitmq
+    networks:
+      - distributed-network
+
+  provider-mac:
+    build: ./provider_mac
+    depends_on:
+      - head-node
+      - rabbitmq
+    networks:
+      - distributed-network
+
+  provider-windows:
+    build: ./provider_windows
+    depends_on:
+      - head-node
+      - rabbitmq
+    networks:
+      - distributed-network
+    # GPU support is commented out for Mac testing
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"  # AMQP port
+      - "15672:15672"  # Management UI
+    networks:
+      - distributed-network
+
+networks:
+  distributed-network:
+    driver: bridge 

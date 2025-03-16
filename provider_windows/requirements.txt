@@ -1,0 +1,6 @@
+pyzmq==22.3.0
+pika==1.2.0
+numpy==1.21.0
+torch==1.12.1
+psutil==5.9.0
+python-json-logger==2.0.2 
